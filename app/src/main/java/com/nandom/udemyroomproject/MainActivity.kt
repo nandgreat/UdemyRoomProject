@@ -4,11 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nandom.udemyroomproject.databinding.ActivityMainBinding
+import com.nandom.udemyroomproject.db.Subscriber
 import com.nandom.udemyroomproject.db.SubscriberDatabase
 import com.nandom.udemyroomproject.db.SubscriberRepository
 
@@ -35,13 +37,12 @@ class MainActivity : AppCompatActivity() {
 
         initRecyclerView()
 
-
     }
 
     private fun displaySubscribers(){
         subscriberViewModel.subscribers.observe(this, Observer {
-            binding.subscriberRecyclerView.adapter = MyRecyclerViewAdapter(it)
-            Log.d(TAG, "displaySubscribers: ${it.toString()}")
+            binding.subscriberRecyclerView.adapter = MyRecyclerViewAdapter(it) { selectedItem:Subscriber->listItemClicked(selectedItem)}
+            Log.d(TAG, "displaySubscribers: $it")
         })
     }
 
@@ -49,5 +50,10 @@ class MainActivity : AppCompatActivity() {
         binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
         displaySubscribers()
 
+    }
+
+    private fun listItemClicked(subscriber: Subscriber){
+        Toast.makeText(this, "Selected name is ${subscriber.name} ", Toast.LENGTH_LONG).show()
+        subscriberViewModel.initUpdateAndDelete(subscriber)
     }
 }
