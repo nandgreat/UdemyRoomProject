@@ -1,5 +1,6 @@
 package com.nandom.udemyroomproject
 
+import android.util.Patterns
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
@@ -41,17 +42,30 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
     fun saveOrUpdate() {
 
-        if (isUpdateOrDelete) {
-            subscriberToUpdateOrDelete.name = inputName.value!!
-            subscriberToUpdateOrDelete.email = inputEmail.value!!
-            update(subscriberToUpdateOrDelete)
-        } else {
-            val name = inputName.value!!
-            val email = inputEmail.value!!
-            insert(Subscriber(0, name, email))
+        when {
+            inputName.value == null -> {
+                statusMessage.value = Event("Please enter Subscriber's name")
+            }
+            inputEmail.value == null -> statusMessage.value =
+                Event("Please enter Subscriber's Email")
+            !Patterns.EMAIL_ADDRESS.matcher(inputEmail.value!!).matches() -> {
+                statusMessage.value = Event("Please enter a Valid Email address")
+            }
+            else -> {
+
+                if (isUpdateOrDelete) {
+                    subscriberToUpdateOrDelete.name = inputName.value!!
+                    subscriberToUpdateOrDelete.email = inputEmail.value!!
+                    update(subscriberToUpdateOrDelete)
+                } else {
+                    val name = inputName.value!!
+                    val email = inputEmail.value!!
+                    insert(Subscriber(0, name, email))
+                }
+                inputName.value = null
+                inputEmail.value = null
+            }
         }
-        inputName.value = null
-        inputEmail.value = null
     }
 
     fun clearOrDelete() {
